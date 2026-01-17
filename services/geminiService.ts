@@ -6,7 +6,7 @@ import { AnalysisResult } from "../types";
 export const analyzeImage = async (base64Image: string, mimeType: string): Promise<AnalysisResult> => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("Brak klucza API. Sprawdź konfigurację środowiska.");
+    throw new Error("Brak klucza API Gemini. Skonfiguruj klucz w ustawieniach środowiska.");
   }
 
   const ai = new GoogleGenAI({ apiKey });
@@ -22,7 +22,7 @@ export const analyzeImage = async (base64Image: string, mimeType: string): Promi
               mimeType: mimeType,
             },
           },
-          { text: "Przeprowadź pełną analizę rozdzielnicy elektrycznej widocznej na zdjęciu. Zidentyfikuj komponenty, oceń jakość, wyszukaj szacunkowe ceny i przygotuj ofertę oraz e-mail dla klienta." },
+          { text: "Przeprowadź audyt techniczny rozdzielnicy. Zidentyfikuj bezpieczniki, ochronniki i ich stan. Wyszukaj aktualne ceny rynkowe dla tych komponentów w Polsce. Przygotuj ofertę modernizacji i e-mail do klienta." },
         ],
       },
       config: {
@@ -76,12 +76,15 @@ export const analyzeImage = async (base64Image: string, mimeType: string): Promi
 
     const resultText = response.text;
     if (!resultText) {
-      throw new Error("Pusta odpowiedź od modelu AI.");
+      throw new Error("Nie udało się uzyskać analizy od modelu AI.");
     }
 
     return JSON.parse(resultText) as AnalysisResult;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    if (error.message?.includes("API_KEY_INVALID")) {
+      throw new Error("Twój klucz API jest nieprawidłowy dla modelu Gemini. Pamiętaj, że klucze OpenAI nie działają z modelem Gemini.");
+    }
     throw error;
   }
 };
