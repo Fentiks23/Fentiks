@@ -1,0 +1,7 @@
+{
+  "name": "Asystent Elektryka AI",
+  "description": "Profesjonalna aplikacja do wspierania pracy elektryka",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
